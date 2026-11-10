@@ -18,8 +18,9 @@
   --danger-text: #8c1d18;
 }
 
+/* Dark values appear twice so both the device setting and an explicit theme choice work. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #10171e;
     --surface: #1a232c;
     --text: #eef2f5;
@@ -37,7 +38,29 @@
     --danger-bg: #401a18;
     --danger-border: #f2877f;
     --danger-text: #ffb4ad;
+    color-scheme: dark;
   }
+}
+
+:root[data-theme="dark"] {
+  --bg: #10171e;
+  --surface: #1a232c;
+  --text: #eef2f5;
+  --muted: #b3c0cb;
+  --border: #5d6c7a;
+  --primary: #6cb2f5;
+  --primary-text: #0a1622;
+  --focus: #ffc04d;
+  --ok-bg: #143021;
+  --ok-border: #5cc47e;
+  --dose-bg: #132c45;
+  --dose-border: #6cb2f5;
+  --warn-bg: #3a2c0c;
+  --warn-border: #f0b144;
+  --danger-bg: #401a18;
+  --danger-border: #f2877f;
+  --danger-text: #ffb4ad;
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -49,13 +72,15 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 1rem;
   line-height: 1.5;
 }
 
 .top, main, footer {
   max-width: 34rem;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
 
 .top {
@@ -150,7 +175,7 @@ button { font: inherit; cursor: pointer; }
 }
 .danger-link { color: var(--danger-text); }
 
-.actions, .meter-buttons { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.actions, .meter-buttons, .confirm-buttons { display: flex; flex-wrap: wrap; gap: 0.75rem; }
 .meter-buttons { margin-top: 0.8rem; }
 .meter-buttons .secondary { font-size: 0.9rem; }
 

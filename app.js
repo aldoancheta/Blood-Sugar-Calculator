@@ -368,10 +368,16 @@
     }));
     $('log-empty').hidden = log.length > 0;
     $('clear-log').hidden = log.length === 0;
+    $('clear-confirm').hidden = true;
+  }
+
+  function askClearLog() {
+    $('clear-log').hidden = true;
+    $('clear-confirm').hidden = false;
+    $('clear-no').focus();
   }
 
   function clearLog() {
-    if (!window.confirm('Clear your whole log? The calculator will no longer know when you last took insulin.')) return;
     log = [];
     save(LOG_KEY, log);
     renderLog();
@@ -384,7 +390,9 @@
   $('calc-form').addEventListener('submit', calculate);
   $('meter-hi').addEventListener('click', function () { meterReading('HI'); });
   $('meter-lo').addEventListener('click', function () { meterReading('LO'); });
-  $('clear-log').addEventListener('click', clearLog);
+  $('clear-log').addEventListener('click', askClearLog);
+  $('clear-yes').addEventListener('click', clearLog);
+  $('clear-no').addEventListener('click', renderLog);
 
   // A result must never stay on screen after the inputs behind it change.
   $('bg').addEventListener('input', clearResult);
