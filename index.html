@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Works out a mealtime correction insulin dose from your blood sugar, target and correction factor.">
+  <title>Blood Sugar Correction Calculator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <h1>Blood Sugar Correction Calculator</h1>
+    <button type="button" id="open-settings" class="link-button" hidden>Settings</button>
+  </header>
+
+  <main>
+    <p id="storage-warning" class="notice warn" hidden>
+      This device cannot save your settings. You will need to enter them again each time you open this page.
+    </p>
+
+    <!-- Setup / settings -->
+    <section id="setup" hidden aria-labelledby="setup-title">
+      <h2 id="setup-title">Set up your numbers</h2>
+      <p class="lead">
+        Use the numbers from your doctor's or nurse's orders. Do not guess.
+        If you are not sure about a number, ask before you use this calculator.
+      </p>
+
+      <form id="settings-form" novalidate>
+        <div class="field">
+          <label for="s-target">Target blood sugar</label>
+          <p class="hint" id="h-target">The number your doctor wants your blood sugar brought down to.</p>
+          <div class="with-unit">
+            <input id="s-target" name="target" type="text" inputmode="numeric" autocomplete="off" maxlength="3" aria-describedby="h-target e-target">
+            <span>mg/dL</span>
+          </div>
+          <p class="error" id="e-target" role="alert"></p>
+        </div>
+
+        <div class="field">
+          <label for="s-cf">Correction factor</label>
+          <p class="hint" id="h-cf">How many points 1 unit of insulin lowers your blood sugar. Also called a sensitivity factor.</p>
+          <div class="with-unit">
+            <input id="s-cf" name="cf" type="text" inputmode="numeric" autocomplete="off" maxlength="3" aria-describedby="h-cf e-cf">
+            <span>points per unit</span>
+          </div>
+          <p class="error" id="e-cf" role="alert"></p>
+        </div>
+
+        <div class="field">
+          <label for="s-threshold">Correction level</label>
+          <p class="hint" id="h-threshold">Take correction insulin only when your blood sugar is above this number. Most often 300.</p>
+          <div class="with-unit">
+            <input id="s-threshold" name="threshold" type="text" inputmode="numeric" autocomplete="off" maxlength="3" aria-describedby="h-threshold e-threshold">
+            <span>mg/dL</span>
+          </div>
+          <p class="error" id="e-threshold" role="alert"></p>
+        </div>
+
+        <div class="field">
+          <label for="s-maxDose">Largest correction dose</label>
+          <p class="hint" id="h-maxDose">The most correction insulin you should take at one time. The calculator will never show more than this.</p>
+          <div class="with-unit">
+            <input id="s-maxDose" name="maxDose" type="text" inputmode="numeric" autocomplete="off" maxlength="2" aria-describedby="h-maxDose e-maxDose">
+            <span>units</span>
+          </div>
+          <p class="error" id="e-maxDose" role="alert"></p>
+        </div>
+
+        <div class="field">
+          <label for="s-callLevel">Call-the-doctor level</label>
+          <p class="hint" id="h-callLevel">At this number or higher, the calculator will tell you to call your doctor or nurse.</p>
+          <div class="with-unit">
+            <input id="s-callLevel" name="callLevel" type="text" inputmode="numeric" autocomplete="off" maxlength="3" aria-describedby="h-callLevel e-callLevel">
+            <span>mg/dL</span>
+          </div>
+          <p class="error" id="e-callLevel" role="alert"></p>
+        </div>
+
+        <fieldset class="field">
+          <legend>How to round the dose</legend>
+          <label class="choice">
+            <input type="radio" name="rounding" value="down-whole">
+            <span>Round down to a whole unit <small>3.8 becomes 3</small></span>
+          </label>
+          <label class="choice">
+            <input type="radio" name="rounding" value="nearest-half">
+            <span>Round to the nearest half unit <small>3.8 becomes 4, and 3.6 becomes 3.5. For half-unit pens.</small></span>
+          </label>
+          <p class="error" id="e-rounding" role="alert"></p>
+        </fieldset>
+
+        <div class="field">
+          <label for="s-stackHours">Hours between doses</label>
+          <p class="hint" id="h-stackHours">How long to wait after rapid-acting insulin before another correction dose. Most often 3 to 4 hours.</p>
+          <div class="with-unit">
+            <input id="s-stackHours" name="stackHours" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-describedby="h-stackHours e-stackHours">
+            <span>hours</span>
+          </div>
+          <p class="error" id="e-stackHours" role="alert"></p>
+        </div>
+
+        <div class="field">
+          <label class="choice">
+            <input type="checkbox" id="s-ack" name="acknowledged">
+            <span>These numbers come from my doctor's or nurse's orders.</span>
+          </label>
+          <p class="error" id="e-acknowledged" role="alert"></p>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="primary">Save my numbers</button>
+          <button type="button" id="cancel-settings" class="secondary" hidden>Cancel</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Calculator -->
+    <section id="calc" hidden aria-labelledby="calc-title">
+      <h2 id="calc-title" class="visually-hidden">Calculator</h2>
+
+      <div class="plan" id="plan" aria-label="Your numbers"></div>
+      <p id="review-note" class="notice warn" hidden></p>
+
+      <form id="calc-form" novalidate>
+        <div class="field">
+          <label for="bg" class="big-label">What is your blood sugar right now?</label>
+          <div class="with-unit">
+            <input id="bg" type="text" inputmode="numeric" autocomplete="off" maxlength="3" class="bg-input" aria-describedby="e-bg">
+            <span>mg/dL</span>
+          </div>
+          <p class="error" id="e-bg" role="alert"></p>
+          <div class="meter-buttons">
+            <button type="button" class="secondary" id="meter-hi">Meter says HI</button>
+            <button type="button" class="secondary" id="meter-lo">Meter says LO</button>
+          </div>
+        </div>
+
+        <fieldset class="field">
+          <legend id="recent-legend">Have you taken rapid-acting insulin in the last 4 hours?</legend>
+          <p class="hint">This means insulin for a meal or for a high blood sugar. It does not mean your long-acting insulin.</p>
+          <div class="yes-no">
+            <label class="choice"><input type="radio" name="recent" value="no"><span>No</span></label>
+            <label class="choice"><input type="radio" name="recent" value="yes"><span>Yes</span></label>
+          </div>
+          <p class="error" id="e-recent" role="alert"></p>
+        </fieldset>
+
+        <button type="submit" class="primary big">Work out my dose</button>
+      </form>
+
+      <div id="result" class="result" role="status" aria-live="polite" hidden></div>
+    </section>
+
+    <!-- Log -->
+    <section id="log-section" hidden>
+      <details>
+        <summary>My log</summary>
+        <p class="hint">Saved on this device only. The calculator uses it to warn you about doses that are too close together.</p>
+        <ul id="log-list" class="log-list"></ul>
+        <p id="log-empty" class="hint">Nothing saved yet.</p>
+        <button type="button" id="clear-log" class="link-button danger-link" hidden>Clear my log</button>
+      </details>
+    </section>
+  </main>
+
+  <footer>
+    <p>
+      This tool does the math only. It does not replace your doctor, nurse, or care plan.
+      If the answer does not look right to you, do not take the dose. Call your doctor or nurse.
+      In an emergency, call 911.
+    </p>
+    <p>Nothing you type leaves this device.</p>
+  </footer>
+
+  <script src="calculator.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
