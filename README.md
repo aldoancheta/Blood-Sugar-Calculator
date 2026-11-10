@@ -6,6 +6,10 @@ It is written for residents and patients: large text, plain words, one question 
 
 > **This tool does the math only.** It does not replace a doctor, nurse, or care plan. Every number it uses must come from the person's own orders.
 
+## Status
+
+**Demo for clinical review.** The page shows a notice saying it is not yet approved for use with residents. After a nurse or medical director has reviewed and approved it, remove the notice at the top of `<main>` in `index.html`.
+
 ## The formula
 
 ```
